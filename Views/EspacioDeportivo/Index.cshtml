@@ -1,0 +1,282 @@
+@model SportsSebastianVargas.ViewModels.EspacioDeportivoViewModel
+
+@{
+    ViewData["Title"] = "Espacios Deportivos";
+    var tipoActivo = Context.Request.Query["tipo"].ToString();
+}
+
+<!-- ── Page header ─────────────────────────────────────────────── -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+        <h2 class="font-h2 text-h2 text-text-main mb-1">Espacios Deportivos</h2>
+        <p class="font-body-sm text-body-sm text-outline">Gestiona y supervisa las instalaciones disponibles.</p>
+    </div>
+    <button onclick="document.getElementById('modal-crear-espacio').classList.remove('hidden')"
+            class="bg-brand-green-dark hover:bg-brand-green-mid text-on-primary font-button text-button
+                   px-4 py-2 rounded flex items-center gap-2 transition-colors shadow-sm">
+        <span class="material-symbols-outlined text-sm">add</span>
+        Registrar Espacio
+    </button>
+</div>
+
+<!-- ── Filtros ─────────────────────────────────────────────────── -->
+<div class="bg-surface-primary p-4 rounded border border-surface-variant mb-6
+            flex flex-col sm:flex-row gap-4 items-center justify-between">
+
+    <div class="flex gap-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
+        <a asp-action="Index"
+           class="px-3 py-1.5 rounded font-label-caps text-label-caps whitespace-nowrap border transition-colors
+                  @(string.IsNullOrEmpty(tipoActivo)
+                        ? "bg-brand-green-light/20 text-brand-green-dark border-brand-green-light"
+                        : "bg-transparent text-outline border-surface-variant hover:bg-surface-container-low")">
+            Todos
+        </a>
+        @foreach (var tipo in new[] { "Cancha", "Piscina", "Pista", "Gimnasio" })
+        {
+            <a asp-action="Index" asp-route-tipo="@tipo"
+               class="px-3 py-1.5 rounded font-label-caps text-label-caps whitespace-nowrap border transition-colors
+                      @(tipoActivo == tipo
+                            ? "bg-brand-green-light/20 text-brand-green-dark border-brand-green-light"
+                            : "bg-transparent text-outline border-surface-variant hover:bg-surface-container-low")">
+                @(tipo + "s")
+            </a>
+        }
+    </div>
+
+    <div class="relative w-full sm:w-64">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">filter_list</span>
+        <form method="get" asp-action="Index">
+            <select name="tipo" onchange="this.form.submit()"
+                    class="w-full pl-9 pr-8 py-2 border border-surface-variant rounded
+                           font-body-sm text-body-sm text-text-main bg-transparent appearance-none
+                           focus:border-brand-green-mid focus:ring-0">
+                <option value="">Estado: Todos</option>
+                <option value="Activo"       @(tipoActivo=="Activo"       ? "selected" : "")>Activo</option>
+                <option value="Mantenimiento" @(tipoActivo=="Mantenimiento"? "selected" : "")>Mantenimiento</option>
+            </select>
+        </form>
+    </div>
+</div>
+
+<!-- ── Grid de cards ───────────────────────────────────────────── -->
+@if (Model.EspacioList.Any())
+{
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach (var e in Model.EspacioList)
+        {
+            <!-- Card -->
+            <div class="bg-surface-primary rounded border border-surface-variant overflow-hidden group hover:shadow-md transition-shadow">
+
+                <!-- Imagen / placeholder por tipo -->
+                <div class="h-48 bg-surface-dim relative flex items-center justify-center">
+                    <span class="material-symbols-outlined text-7xl text-outline/20">
+                        @(e.Tipo.ToLower() switch {
+                            var t when t.Contains("fútbol") || t.Contains("futbol") || t.Contains("cancha") => "sports_soccer",
+                            var t when t.Contains("tenis")  => "sports_tennis",
+                            var t when t.Contains("balon")  => "sports_basketball",
+                            var t when t.Contains("piscin") || t.Contains("nataci") => "pool",
+                            var t when t.Contains("pista")  || t.Contains("atletis") => "directions_run",
+                            _ => "stadium"
+                        })
+                    </span>
+                    <!-- Badge estado -->
+                    @if (e.Activo)
+                    {
+                        <div class="absolute top-3 right-3 bg-brand-green-light text-brand-green-dark
+                                    px-2 py-1 rounded font-label-caps text-label-caps flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-brand-green-dark"></span> Activa
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="absolute top-3 right-3 bg-status-warning/20 text-status-warning
+                                    px-2 py-1 rounded font-label-caps text-label-caps flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-status-warning"></span> Mantenimiento
+                        </div>
+                    }
+                </div>
+
+                <!-- Info -->
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-h3 text-h3 text-text-main">@e.Nombre</h3>
+                        <span class="material-symbols-outlined text-outline">
+                            @(e.Tipo.ToLower() switch {
+                                var t when t.Contains("fútbol") || t.Contains("futbol") || t.Contains("cancha") => "sports_soccer",
+                                var t when t.Contains("tenis")  => "sports_tennis",
+                                var t when t.Contains("balon")  => "sports_basketball",
+                                var t when t.Contains("piscin") => "pool",
+                                var t when t.Contains("pista")  => "directions_run",
+                                _ => "stadium"
+                            })
+                        </span>
+                    </div>
+                    <p class="font-body-sm text-body-sm text-outline mb-4">@e.Tipo</p>
+
+                    <div class="flex justify-between items-center border-t border-surface-variant pt-3">
+                        <span class="font-label-caps text-label-caps text-outline">
+                            Capacidad: @e.Capacidad personas
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <button title="Editar"
+                                    onclick="abrirModalEditarEspacio(@e.Id, '@e.Nombre', '@e.Tipo', @e.Capacidad)"
+                                    class="p-1 text-slate-400 hover:text-brand-green-mid transition-colors">
+                                <span class="material-symbols-outlined text-sm">edit</span>
+                            </button>
+                            <form asp-action="Delete" asp-route-id="@e.Id" method="post" style="display:inline;"
+                                  onsubmit="return confirm('¿Eliminar @e.Nombre?')">
+                                <button type="submit" title="Eliminar"
+                                        class="p-1 text-slate-400 hover:text-status-error transition-colors">
+                                    <span class="material-symbols-outlined text-sm">delete</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="flex flex-col items-center justify-center py-24 text-on-surface-variant">
+        <span class="material-symbols-outlined text-6xl opacity-25 mb-3">stadium</span>
+        <p class="font-body-sm text-body-sm">No hay espacios deportivos registrados.</p>
+    </div>
+}
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     Modal: Crear Espacio
+══════════════════════════════════════════════════════════════ -->
+<div id="modal-crear-espacio"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="bg-surface-primary rounded-xl border border-outline-variant shadow-xl w-full max-w-md mx-4">
+
+        <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-brand-green-mid">add_circle</span>
+                <h3 class="font-h3 text-h3 text-brand-green-dark">Registrar Espacio</h3>
+            </div>
+            <button onclick="document.getElementById('modal-crear-espacio').classList.add('hidden')"
+                    class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-surface-secondary rounded transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form asp-action="Create" method="post" class="px-6 py-5 flex flex-col gap-4">
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Nombre</label>
+                <input name="Nombre" required placeholder="Ej. Cancha Principal Norte"
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Tipo</label>
+                <input name="Tipo" required placeholder="Ej. Cancha de fútbol, Piscina..."
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Capacidad</label>
+                <input name="Capacidad" type="number" min="1" required placeholder="Número de personas"
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div class="flex gap-3 justify-end pt-2">
+                <button type="button"
+                        onclick="document.getElementById('modal-crear-espacio').classList.add('hidden')"
+                        class="px-4 py-2 border border-outline-variant rounded text-on-surface-variant
+                               font-button text-button hover:bg-surface-secondary transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-5 py-2 bg-brand-green-dark hover:bg-brand-green-mid text-on-primary
+                               font-button text-button rounded transition-colors shadow-sm flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">add</span>
+                    Registrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     Modal: Editar Espacio
+══════════════════════════════════════════════════════════════ -->
+<div id="modal-editar-espacio"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="bg-surface-primary rounded-xl border border-outline-variant shadow-xl w-full max-w-md mx-4">
+
+        <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-brand-green-mid">edit</span>
+                <h3 class="font-h3 text-h3 text-brand-green-dark">Editar Espacio</h3>
+            </div>
+            <button onclick="document.getElementById('modal-editar-espacio').classList.add('hidden')"
+                    class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-surface-secondary rounded transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form asp-action="Edit" method="post" class="px-6 py-5 flex flex-col gap-4">
+            <input type="hidden" id="espacio-edit-id" name="Id" />
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Nombre</label>
+                <input id="espacio-edit-nombre" name="Nombre" required
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Tipo</label>
+                <input id="espacio-edit-tipo" name="Tipo" required
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Capacidad</label>
+                <input id="espacio-edit-capacidad" name="Capacidad" type="number" min="1" required
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div class="flex gap-3 justify-end pt-2">
+                <button type="button"
+                        onclick="document.getElementById('modal-editar-espacio').classList.add('hidden')"
+                        class="px-4 py-2 border border-outline-variant rounded text-on-surface-variant
+                               font-button text-button hover:bg-surface-secondary transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-5 py-2 bg-brand-green-dark hover:bg-brand-green-mid text-on-primary
+                               font-button text-button rounded transition-colors shadow-sm flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">save</span>
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function abrirModalEditarEspacio(id, nombre, tipo, capacidad) {
+            document.getElementById('espacio-edit-id').value        = id;
+            document.getElementById('espacio-edit-nombre').value    = nombre;
+            document.getElementById('espacio-edit-tipo').value      = tipo;
+            document.getElementById('espacio-edit-capacidad').value = capacidad;
+            document.getElementById('modal-editar-espacio').classList.remove('hidden');
+        }
+        ['modal-crear-espacio','modal-editar-espacio'].forEach(id => {
+            document.getElementById(id).addEventListener('click', function(e) {
+                if (e.target === this) this.classList.add('hidden');
+            });
+        });
+    </script>
+}

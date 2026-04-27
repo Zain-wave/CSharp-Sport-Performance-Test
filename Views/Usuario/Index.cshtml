@@ -1,0 +1,287 @@
+@model SportsSebastianVargas.ViewModels.UsuarioViewModel
+
+@{
+    ViewData["Title"] = "Usuarios";
+}
+
+<!-- ── Page header ─────────────────────────────────────────────── -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+        <h2 class="font-h2 text-h2 text-text-main mb-1">Gestión de Usuarios</h2>
+        <p class="font-body-sm text-body-sm text-outline">Administra los miembros, roles y accesos al complejo deportivo.</p>
+    </div>
+    <button onclick="document.getElementById('modal-crear-usuario').classList.remove('hidden')"
+            class="bg-brand-green-dark hover:bg-brand-green-mid text-on-primary font-button text-button
+                   px-5 py-2.5 rounded flex items-center gap-2 transition-colors shadow-sm">
+        <span class="material-symbols-outlined text-sm">person_add</span>
+        Agregar Usuario
+    </button>
+</div>
+
+<!-- ── Toolbar ─────────────────────────────────────────────────── -->
+<div class="bg-surface-primary border border-outline-variant rounded-t-lg p-4
+            flex flex-col sm:flex-row gap-4 justify-between items-center">
+    <div class="relative w-full sm:w-auto">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+        <input type="text" placeholder="Buscar por nombre o correo..."
+               class="w-full sm:w-80 pl-10 pr-4 py-2 bg-surface border border-outline-variant rounded
+                      font-body-sm text-body-sm text-on-surface
+                      focus:outline-none focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid transition-all" />
+    </div>
+    <div class="flex gap-3 w-full sm:w-auto">
+        <select class="w-full sm:w-auto bg-surface border border-outline-variant rounded px-4 py-2
+                       font-body-sm text-body-sm text-on-surface-variant
+                       focus:outline-none focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid">
+            <option value="">Estado</option>
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+        </select>
+    </div>
+</div>
+
+<!-- ── Tabla ───────────────────────────────────────────────────── -->
+<div class="bg-surface-primary border-x border-b border-outline-variant rounded-b-lg overflow-x-auto shadow-sm">
+    <table class="w-full text-left border-collapse">
+        <thead class="bg-surface-secondary border-b border-outline-variant">
+            <tr>
+                <th class="py-3 px-6 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Usuario</th>
+                <th class="py-3 px-6 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Contacto</th>
+                <th class="py-3 px-6 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Documento</th>
+                <th class="py-3 px-6 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Estado</th>
+                <th class="py-3 px-6 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider text-right">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="font-body-sm text-body-sm">
+            @foreach (var u in Model.UsuarioList)
+            {
+                <tr class="border-b border-outline-variant/50 hover:bg-surface transition-colors">
+                    <!-- Nombre + ID -->
+                    <td class="py-4 px-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center
+                                        text-on-surface-variant font-medium border border-outline-variant text-sm">
+                                @(u.Nombre.Length >= 2 ? u.Nombre.Substring(0,2).ToUpper() : u.Nombre.ToUpper())
+                            </div>
+                            <div>
+                                <p class="font-medium text-on-surface">@u.Nombre</p>
+                                <p class="text-on-surface-variant text-xs">ID: USR-@u.Id.ToString("D3")</p>
+                            </div>
+                        </div>
+                    </td>
+                    <!-- Contacto -->
+                    <td class="py-4 px-6 text-on-surface-variant">
+                        <p>@u.CorreoElectronico</p>
+                        <p class="text-xs mt-0.5">@(string.IsNullOrEmpty(u.Telefono) ? "-" : u.Telefono)</p>
+                    </td>
+                    <!-- Documento -->
+                    <td class="py-4 px-6 text-on-surface-variant">
+                        @u.DocumentoIdentidad
+                    </td>
+                    <!-- Estado -->
+                    <td class="py-4 px-6">
+                        @if (u.Activo)
+                        {
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-green-light text-brand-green-dark">
+                                Activo
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-error-container text-status-error">
+                                Inactivo
+                            </span>
+                        }
+                    </td>
+                    <!-- Acciones -->
+                    <td class="py-4 px-6 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            <button title="Editar"
+                                    onclick="abrirModalEditar(@u.Id, '@u.Nombre', '@u.DocumentoIdentidad', '@u.Telefono', '@u.CorreoElectronico')"
+                                    class="p-1.5 text-slate-400 hover:text-brand-green-mid hover:bg-surface-secondary rounded transition-colors">
+                                <span class="material-symbols-outlined text-sm">edit</span>
+                            </button>
+                            <form asp-action="Delete" asp-route-id="@u.Id" method="post" style="display:inline;"
+                                  onsubmit="return confirm('¿Eliminar a @u.Nombre?')">
+                                <button type="submit" title="Eliminar"
+                                        class="p-1.5 text-slate-400 hover:text-status-error hover:bg-error-container rounded transition-colors">
+                                    <span class="material-symbols-outlined text-sm">delete</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+
+            @if (!Model.UsuarioList.Any())
+            {
+                <tr>
+                    <td colspan="5" class="py-12 text-center text-on-surface-variant font-body-sm text-body-sm">
+                        <span class="material-symbols-outlined text-4xl block mb-2 opacity-30">group_off</span>
+                        No hay usuarios registrados.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- ── Pie de tabla ────────────────────────────────────────────── -->
+<div class="flex items-center justify-between mt-4 px-2">
+    <p class="font-body-sm text-body-sm text-on-surface-variant">
+        Mostrando <span class="font-medium text-on-surface">@Model.UsuarioList.Count</span> usuarios
+    </p>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     Modal: Crear Usuario
+══════════════════════════════════════════════════════════════ -->
+<div id="modal-crear-usuario"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="bg-surface-primary rounded-xl border border-outline-variant shadow-xl w-full max-w-lg mx-4">
+
+        <!-- Header del modal -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-brand-green-mid">person_add</span>
+                <h3 class="font-h3 text-h3 text-brand-green-dark">Nuevo Usuario</h3>
+            </div>
+            <button onclick="document.getElementById('modal-crear-usuario').classList.add('hidden')"
+                    class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-surface-secondary rounded transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Form -->
+        <form asp-action="Create" method="post" class="px-6 py-5 flex flex-col gap-4">
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Nombre Completo</label>
+                <input name="Nombre" required placeholder="Ej. Ana García Ríos"
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Documento de Identidad</label>
+                <input name="DocumentoIdentidad" required placeholder="Número de documento"
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Teléfono</label>
+                <input name="Telefono" placeholder="+57 300 000 0000"
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Correo Electrónico</label>
+                <input name="CorreoElectronico" type="email" required placeholder="correo@ejemplo.com"
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div class="flex gap-3 justify-end pt-2">
+                <button type="button"
+                        onclick="document.getElementById('modal-crear-usuario').classList.add('hidden')"
+                        class="px-4 py-2 border border-outline-variant rounded text-on-surface-variant
+                               font-button text-button hover:bg-surface-secondary transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-5 py-2 bg-brand-green-dark hover:bg-brand-green-mid text-on-primary
+                               font-button text-button rounded transition-colors shadow-sm flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">person_add</span>
+                    Agregar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     Modal: Editar Usuario
+══════════════════════════════════════════════════════════════ -->
+<div id="modal-editar-usuario"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="bg-surface-primary rounded-xl border border-outline-variant shadow-xl w-full max-w-lg mx-4">
+
+        <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-brand-green-mid">edit</span>
+                <h3 class="font-h3 text-h3 text-brand-green-dark">Editar Usuario</h3>
+            </div>
+            <button onclick="document.getElementById('modal-editar-usuario').classList.add('hidden')"
+                    class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-surface-secondary rounded transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form asp-action="Edit" method="post" class="px-6 py-5 flex flex-col gap-4">
+            <input type="hidden" id="edit-id" name="Id" />
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Nombre Completo</label>
+                <input id="edit-nombre" name="Nombre" required
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Documento de Identidad</label>
+                <input id="edit-documento" name="DocumentoIdentidad" required
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Teléfono</label>
+                <input id="edit-telefono" name="Telefono"
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Correo Electrónico</label>
+                <input id="edit-correo" name="CorreoElectronico" type="email" required
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div class="flex gap-3 justify-end pt-2">
+                <button type="button"
+                        onclick="document.getElementById('modal-editar-usuario').classList.add('hidden')"
+                        class="px-4 py-2 border border-outline-variant rounded text-on-surface-variant
+                               font-button text-button hover:bg-surface-secondary transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-5 py-2 bg-brand-green-dark hover:bg-brand-green-mid text-on-primary
+                               font-button text-button rounded transition-colors shadow-sm flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">save</span>
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function abrirModalEditar(id, nombre, documento, telefono, correo) {
+            document.getElementById('edit-id').value        = id;
+            document.getElementById('edit-nombre').value    = nombre;
+            document.getElementById('edit-documento').value = documento;
+            document.getElementById('edit-telefono').value  = telefono;
+            document.getElementById('edit-correo').value    = correo;
+            document.getElementById('modal-editar-usuario').classList.remove('hidden');
+        }
+        // Cerrar modal al hacer clic fuera
+        ['modal-crear-usuario','modal-editar-usuario'].forEach(id => {
+            document.getElementById(id).addEventListener('click', function(e) {
+                if (e.target === this) this.classList.add('hidden');
+            });
+        });
+    </script>
+}

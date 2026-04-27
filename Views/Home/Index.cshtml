@@ -1,0 +1,63 @@
+
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<!-- ── Bienvenida ─────────────────────────────────────────────── -->
+<div class="mb-8">
+    <h2 class="font-h2 text-h2 text-text-main mb-1">Panel de Control</h2>
+    <p class="font-body-sm text-body-sm text-outline">Bienvenido al sistema de gestión del complejo deportivo.</p>
+</div>
+
+<!-- ── Cards de acceso rápido ─────────────────────────────────── -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <!-- Usuarios -->
+    <a asp-controller="Usuario" asp-action="Index"
+       class="bg-surface-primary border border-surface-variant rounded-xl p-6
+              hover:shadow-md hover:border-brand-green-light transition-all group">
+        <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-brand-green-light/20 flex items-center justify-center">
+                <span class="material-symbols-outlined text-brand-green-dark text-2xl">group</span>
+            </div>
+            <span class="material-symbols-outlined text-outline group-hover:text-brand-green-mid transition-colors">
+                arrow_forward
+            </span>
+        </div>
+        <h3 class="font-h3 text-h3 text-text-main mb-1">Usuarios</h3>
+        <p class="font-body-sm text-body-sm text-outline">Registrar y gestionar miembros del complejo.</p>
+    </a>
+
+    <!-- Espacios -->
+    <a asp-controller="EspacioDeportivo" asp-action="Index"
+       class="bg-surface-primary border border-surface-variant rounded-xl p-6
+              hover:shadow-md hover:border-brand-green-light transition-all group">
+        <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-brand-green-light/20 flex items-center justify-center">
+                <span class="material-symbols-outlined text-brand-green-dark text-2xl">stadium</span>
+            </div>
+            <span class="material-symbols-outlined text-outline group-hover:text-brand-green-mid transition-colors">
+                arrow_forward
+            </span>
+        </div>
+        <h3 class="font-h3 text-h3 text-text-main mb-1">Espacios Deportivos</h3>
+        <p class="font-body-sm text-body-sm text-outline">Administrar instalaciones disponibles.</p>
+    </a>
+
+    <!-- Reservas -->
+    <a asp-controller="Reserva" asp-action="Index"
+       class="bg-surface-primary border border-surface-variant rounded-xl p-6
+              hover:shadow-md hover:border-brand-green-light transition-all group">
+        <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-brand-green-light/20 flex items-center justify-center">
+                <span class="material-symbols-outlined text-brand-green-dark text-2xl">event_available</span>
+            </div>
+            <span class="material-symbols-outlined text-outline group-hover:text-brand-green-mid transition-colors">
+                arrow_forward
+            </span>
+        </div>
+        <h3 class="font-h3 text-h3 text-text-main mb-1">Reservas</h3>
+        <p class="font-body-sm text-body-sm text-outline">Gestionar asignación de espacios.</p>
+    </a>
+
+</div>

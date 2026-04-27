@@ -1,0 +1,290 @@
+@model SportsSebastianVargas.ViewModels.ReservaViewModel
+@using SportsSebastianVargas.Models.Enums
+
+@{
+    ViewData["Title"] = "Reservas";
+}
+
+<!-- ── Page header ─────────────────────────────────────────────── -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4">
+    <div>
+        <h2 class="font-h2 text-h2 text-brand-green-dark mb-1">Control de Reservas</h2>
+        <p class="font-body-base text-body-base text-on-surface-variant">
+            Supervisa y gestiona la asignación de espacios deportivos institucionales.
+        </p>
+    </div>
+    <button class="bg-surface-primary border border-outline-variant text-text-main hover:bg-surface-secondary
+                   transition-colors rounded-xl px-4 py-2 font-button text-button flex items-center gap-2 shadow-sm">
+        <span class="material-symbols-outlined text-[18px]">download</span>
+        Exportar Reporte
+    </button>
+</div>
+
+<!-- ── Bento grid ──────────────────────────────────────────────── -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+
+    <!-- ── Columna izquierda: tabla + filtros (8 cols) ──────────── -->
+    <div class="lg:col-span-8 flex flex-col gap-4">
+
+        <!-- Filtros -->
+        <div class="bg-surface-primary border border-outline-variant rounded-xl p-4 shadow-sm
+                    flex flex-wrap gap-4 items-end">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">
+                    Buscar Usuario
+                </label>
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+                    <input type="text" placeholder="Nombre o ID..."
+                           class="w-full pl-10 pr-3 py-2 bg-surface border border-outline-variant rounded
+                                  font-body-sm text-body-sm text-on-surface
+                                  focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+                </div>
+            </div>
+            <div class="flex-1 min-w-[200px]">
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">
+                    Espacio Deportivo
+                </label>
+                <select class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                               font-body-sm text-body-sm text-on-surface
+                               focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none appearance-none">
+                    <option>Todos los espacios</option>
+                    @foreach (var r in Model.ReservaList
+                        .Where(r => r.EspacioDeportivo != null)
+                        .Select(r => r.EspacioDeportivo!.Nombre)
+                        .Distinct())
+                    {
+                        <option>@r</option>
+                    }
+                </select>
+            </div>
+            <button class="bg-transparent border border-brand-green-mid text-brand-green-mid
+                           hover:bg-brand-green-mid/5 transition-colors rounded-xl px-6 py-2
+                           font-button text-button h-[38px]">
+                Filtrar
+            </button>
+        </div>
+
+        <!-- Tabla -->
+        <div class="bg-surface-primary border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+            <div class="px-6 py-4 border-b border-outline-variant bg-surface flex justify-between items-center">
+                <h3 class="font-h3 text-h3 text-on-surface">Reservas Recientes</h3>
+                <span class="bg-surface-container text-on-surface-variant px-3 py-1 rounded-full
+                             font-label-caps text-label-caps border border-outline-variant">
+                    @Model.ReservaList.Count TOTAL
+                </span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-surface-secondary">
+                            <th class="py-3 px-6 font-label-caps text-label-caps text-text-main border-b border-outline-variant w-1/4">
+                                Usuario
+                            </th>
+                            <th class="py-3 px-6 font-label-caps text-label-caps text-text-main border-b border-outline-variant w-1/4">
+                                Espacio
+                            </th>
+                            <th class="py-3 px-6 font-label-caps text-label-caps text-text-main border-b border-outline-variant">
+                                Fecha &amp; Hora
+                            </th>
+                            <th class="py-3 px-6 font-label-caps text-label-caps text-text-main border-b border-outline-variant">
+                                Estado
+                            </th>
+                            <th class="py-3 px-6 font-label-caps text-label-caps text-text-main border-b border-outline-variant text-right">
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="font-body-sm text-body-sm text-on-surface">
+                        @{int rowIndex = 0;}
+                        @foreach (var r in Model.ReservaList)
+                        {
+                            var isZebra = rowIndex % 2 != 0;
+                            rowIndex++;
+                            <tr class="border-b border-surface-variant transition-colors
+                                       @(isZebra ? "bg-surface-secondary hover:bg-surface-container-high" : "bg-surface-primary hover:bg-surface")">
+                                <td class="py-4 px-6 font-medium">
+                                    @(r.Usuario?.Nombre ?? $"ID: {r.UsuarioId}")
+                                </td>
+                                <td class="py-4 px-6">
+                                    @(r.EspacioDeportivo?.Nombre ?? $"ID: {r.EspacioDeportivoId}")
+                                </td>
+                                <td class="py-4 px-6">
+                                    <div class="flex flex-col">
+                                        <span>@r.Fecha.ToString("dd MMM yyyy")</span>
+                                        <span class="text-on-surface-variant text-[12px]">
+                                            @r.HoraInicio.ToString(@"hh\:mm") – @r.HoraFin.ToString(@"hh\:mm")
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    @switch (r.Estado)
+                                    {
+                                        case EstadoReserva.Activa:
+                                            <span class="bg-brand-green-light/30 text-brand-green-dark px-2 py-1 rounded-full
+                                                         font-label-caps text-label-caps inline-flex items-center gap-1
+                                                         border border-brand-green-light/50">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-brand-green-dark"></span>
+                                                Activa
+                                            </span>
+                                            break;
+                                        case EstadoReserva.Cancelada:
+                                            <span class="bg-error-container text-error px-2 py-1 rounded-full
+                                                         font-label-caps text-label-caps inline-flex items-center gap-1
+                                                         border border-error/20">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                                                Cancelada
+                                            </span>
+                                            break;
+                                        case EstadoReserva.Finalizada:
+                                            <span class="bg-surface-dim text-text-main px-2 py-1 rounded-full
+                                                         font-label-caps text-label-caps inline-flex items-center gap-1
+                                                         border border-outline-variant">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                                                Finalizada
+                                            </span>
+                                            break;
+                                    }
+                                </td>
+                                <td class="py-4 px-6 text-right">
+                                    @if (r.Estado == EstadoReserva.Activa)
+                                    {
+                                        <form asp-action="Cancel" asp-route-id="@r.Id" method="post" style="display:inline;">
+                                            <button type="submit" title="Cancelar"
+                                                    class="text-outline hover:text-status-error p-1 transition-colors">
+                                                <span class="material-symbols-outlined text-[20px]">cancel</span>
+                                            </button>
+                                        </form>
+                                        <form asp-action="Finish" asp-route-id="@r.Id" method="post" style="display:inline;">
+                                            <button type="submit" title="Finalizar"
+                                                    class="text-outline hover:text-brand-green-mid p-1 transition-colors">
+                                                <span class="material-symbols-outlined text-[20px]">check_circle</span>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button title="Ver detalles"
+                                                class="text-outline hover:text-brand-green-mid p-1 transition-colors">
+                                            <span class="material-symbols-outlined text-[20px]">visibility</span>
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+
+                        @if (!Model.ReservaList.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="py-12 text-center text-on-surface-variant font-body-sm text-body-sm">
+                                    <span class="material-symbols-outlined text-4xl block mb-2 opacity-30">event_busy</span>
+                                    No hay reservas registradas.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Columna derecha: formulario (4 cols) ─────────────────── -->
+    <div class="lg:col-span-4 sticky top-[88px]">
+
+        <!-- Card del formulario -->
+        <div class="bg-surface-primary border border-brand-green-dark/20 rounded-xl p-6
+                    shadow-[0_4px_20px_-4px_rgba(27,94,32,0.05)]">
+            <div class="flex items-center gap-2 mb-6">
+                <span class="material-symbols-outlined text-brand-green-mid"
+                      style="font-variation-settings:'FILL' 1">add_circle</span>
+                <h3 class="font-h3 text-h3 text-brand-green-dark">Nueva Reserva</h3>
+            </div>
+
+            <form asp-action="Create" method="post" class="flex flex-col gap-4">
+
+                <!-- Usuario -->
+                <div>
+                    <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">
+                        ID Usuario Solicitante
+                    </label>
+                    <input name="UsuarioId" type="number" min="1" required placeholder="ID del usuario..."
+                           class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                                  font-body-sm text-body-sm text-on-surface
+                                  focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+                </div>
+
+                <!-- Espacio -->
+                <div>
+                    <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">
+                        Espacio Deportivo
+                    </label>
+                    <select name="EspacioDeportivoId" required
+                            class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                                   font-body-sm text-body-sm text-on-surface
+                                   focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none appearance-none">
+                        <option value="" disabled selected>Seleccione un espacio...</option>
+                        @foreach (var e in Model.ReservaList
+                            .Where(r => r.EspacioDeportivo != null)
+                            .Select(r => r.EspacioDeportivo!)
+                            .DistinctBy(e => e.Id))
+                        {
+                            <option value="@e.Id">@e.Nombre</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Fecha -->
+                <div>
+                    <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">
+                        Fecha
+                    </label>
+                    <input name="Fecha" type="date" required
+                           min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                           class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                                  font-body-sm text-body-sm text-on-surface
+                                  focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+                </div>
+
+                <!-- Horas -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">
+                            Hora Inicio
+                        </label>
+                        <input name="HoraInicio" type="time" required
+                               class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                                      font-body-sm text-body-sm text-on-surface
+                                      focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+                    </div>
+                    <div>
+                        <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">
+                            Hora Fin
+                        </label>
+                        <input name="HoraFin" type="time" required
+                               class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                                      font-body-sm text-body-sm text-on-surface
+                                      focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="mt-4 bg-brand-green-dark text-on-primary hover:bg-brand-green-mid transition-colors
+                               rounded-xl w-full py-3 font-button text-button shadow-sm flex items-center justify-center gap-2">
+                    Crear Reserva
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Info card -->
+        <div class="mt-4 bg-surface-container-low border border-outline-variant/50 rounded-xl p-4 flex gap-3">
+            <span class="material-symbols-outlined text-outline">info</span>
+            <p class="font-body-sm text-[13px] text-on-surface-variant leading-relaxed">
+                Los campos <strong>ID Usuario</strong> y <strong>Espacio</strong> deben corresponder
+                a registros existentes en el sistema.
+            </p>
+        </div>
+
+    </div>
+</div>
