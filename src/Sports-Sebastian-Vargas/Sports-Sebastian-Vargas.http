@@ -1,6 +1,0 @@
-@Sports_Sebastian_Vargas_HostAddress = http://localhost:5255
-
-GET {{Sports_Sebastian_Vargas_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
