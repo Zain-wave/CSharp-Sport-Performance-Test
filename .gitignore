@@ -67,3 +67,6 @@ TestResults/
 coverage/
 *.coverage
 *.coveragexml
+
+# Static files (lib) - can be restored
+lib/
