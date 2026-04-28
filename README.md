@@ -1,4 +1,4 @@
-# Sports Sebastian Vargas - Sports Complex Management System
+# 🏟️ Sports Sebastian Vargas - Sports Management System
 
 Internal system to manage users, sports facilities, and reservations for a sports complex.
 
@@ -98,6 +98,15 @@ Sports-Sebastian-Vargas/
 ├── diagrama-casos-uso.png # Use case diagram
 └── README.md          # This file
 ```
+
+## 🏗️ Project Architecture
+
+The project follows the **MVC (Model-View-Controller)** pattern:
+
+- **Models**: Entities (Usuario, Reserva, EspacioDeportivo)
+- **Views**: Razor pages with Tailwind CSS
+- **Controllers**: Handle HTTP requests and routing
+- **Services**: Business logic (UsuarioService, ReservaService, EspacioDeportivoService, EmailService)
 
 ## 📊 Diagrams
 
