@@ -9,21 +9,25 @@ public class ReservaController : Controller
 {
     private readonly ReservaService _reservaService;
     private readonly UsuarioService _usuarioService;
+    private readonly EspacioDeportivoService _espacioService;
 
-    public ReservaController(ReservaService reservaService, UsuarioService usuarioService)
+    public ReservaController(ReservaService reservaService, UsuarioService usuarioService, EspacioDeportivoService espacioService)
     {
         _reservaService = reservaService;
         _usuarioService = usuarioService;
+        _espacioService = espacioService;
     }
 
     public async Task<IActionResult> Index()
     {
         var reservas = await _reservaService.GetReservas();
         var usuarios = await _usuarioService.GetUsuarios();
+        var espacios = await _espacioService.GetEspacios();
         return View(new ReservaViewModel
         {
             ReservaList = reservas.Data ?? new List<Reserva>(),
-            UsuarioList = usuarios.Data ?? new List<Usuario>()
+            UsuarioList = usuarios.Data ?? new List<Usuario>(),
+            EspacioList = espacios.Data ?? new List<EspacioDeportivo>()
         });
     }
 

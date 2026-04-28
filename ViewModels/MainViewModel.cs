@@ -19,4 +19,5 @@ public class ReservaViewModel
     public List<Reserva> ReservaList { get; set; } = new();
     public Reserva Reserva { get; set; } = new();
     public List<Usuario> UsuarioList { get; set; } = new();
+    public List<EspacioDeportivo> EspacioList { get; set; } = new();
 }
