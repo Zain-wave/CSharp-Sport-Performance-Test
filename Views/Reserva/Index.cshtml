@@ -206,12 +206,18 @@
                 <!-- Usuario -->
                 <div>
                     <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">
-                        ID Usuario Solicitante
+                        Usuario Solicitante
                     </label>
-                    <input name="UsuarioId" type="number" min="1" required placeholder="ID del usuario..."
-                           class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
-                                  font-body-sm text-body-sm text-on-surface
-                                  focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+                    <select name="UsuarioId" required
+                            class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                                   font-body-sm text-body-sm text-on-surface
+                                   focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none appearance-none">
+                        <option value="" disabled selected>Seleccione un usuario...</option>
+                        @foreach (var u in Model.UsuarioList)
+                        {
+                            <option value="@u.Id">@u.Nombre (USR-@u.Id.ToString("000"))</option>
+                        }
+                    </select>
                 </div>
 
                 <!-- Espacio -->
