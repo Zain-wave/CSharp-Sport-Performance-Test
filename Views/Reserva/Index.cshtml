@@ -230,12 +230,9 @@
                                    font-body-sm text-body-sm text-on-surface
                                    focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none appearance-none">
                         <option value="" disabled selected>Seleccione un espacio...</option>
-                        @foreach (var e in Model.ReservaList
-                            .Where(r => r.EspacioDeportivo != null)
-                            .Select(r => r.EspacioDeportivo!)
-                            .DistinctBy(e => e.Id))
+                        @foreach (var e in Model.EspacioList)
                         {
-                            <option value="@e.Id">@e.Nombre</option>
+                            <option value="@e.Id">@e.Nombre (ESP-@e.Id.ToString("000"))</option>
                         }
                     </select>
                 </div>
@@ -283,13 +280,6 @@
             </form>
         </div>
 
-        <!-- Info card -->
-        <div class="mt-4 bg-surface-container-low border border-outline-variant/50 rounded-xl p-4 flex gap-3">
-            <span class="material-symbols-outlined text-outline">info</span>
-            <p class="font-body-sm text-[13px] text-on-surface-variant leading-relaxed">
-                Los campos <strong>ID Usuario</strong> y <strong>Espacio</strong> deben corresponder
-                a registros existentes en el sistema.
-            </p>
         </div>
 
     </div>
