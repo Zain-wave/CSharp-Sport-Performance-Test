@@ -34,9 +34,17 @@ public class ReservaService
             .Include(r => r.EspacioDeportivo)
             .Where(r => r.Usuario!.Activo && r.EspacioDeportivo!.Activo);
 
-        if (!string.IsNullOrEmpty(usuarioId) && int.TryParse(usuarioId, out var uid))
+        if (!string.IsNullOrEmpty(usuarioId))
         {
-            query = query.Where(r => r.UsuarioId == uid);
+            if (int.TryParse(usuarioId, out var uid))
+            {
+                query = query.Where(r => r.UsuarioId == uid);
+            }
+            else
+            {
+                var nombreBusqueda = usuarioId.ToLower();
+                query = query.Where(r => r.Usuario!.Nombre.ToLower().Contains(nombreBusqueda));
+            }
         }
 
         if (!string.IsNullOrEmpty(espacioId) && int.TryParse(espacioId, out var eid))
