@@ -18,6 +18,13 @@
     </button>
 </div>
 
+@if (TempData["Mensaje"] != null)
+{
+    <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4 font-body-sm">
+        @TempData["Mensaje"]
+    </div>
+}
+
 <!-- ── Toolbar ─────────────────────────────────────────────────── -->
 <div class="bg-surface-primary border border-outline-variant rounded-t-lg p-4
             flex flex-col sm:flex-row gap-4 justify-between items-center">
@@ -153,7 +160,8 @@
         </div>
 
         <!-- Form -->
-        <form asp-action="Create" method="post" class="px-6 py-5 flex flex-col gap-4">
+        <form action="/Usuario/Create" method="post" class="px-6 py-5 flex flex-col gap-4">
+            <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm"></div>
             <div>
                 <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Nombre Completo</label>
                 <input name="Nombre" required placeholder="Ej. Ana García Ríos"
@@ -219,7 +227,8 @@
             </button>
         </div>
 
-        <form asp-action="Edit" method="post" class="px-6 py-5 flex flex-col gap-4">
+        <form action="/Usuario/Edit" method="post" class="px-6 py-5 flex flex-col gap-4">
+            <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm"></div>
             <input type="hidden" id="edit-id" name="Id" />
             <div>
                 <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Nombre Completo</label>
