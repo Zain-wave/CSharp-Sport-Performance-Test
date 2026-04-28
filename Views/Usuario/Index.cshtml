@@ -107,8 +107,9 @@
                                     class="p-1.5 text-slate-400 hover:text-brand-green-mid hover:bg-surface-secondary rounded transition-colors">
                                 <span class="material-symbols-outlined text-sm">edit</span>
                             </button>
-                            <form action="/Usuario/Delete" asp-route-id="@u.Id" method="post" style="display:inline;"
+                            <form action="/Usuario/Delete" method="post" style="display:inline;"
                                   onsubmit="return confirm('¿Eliminar a @u.Nombre?')">
+                                <input type="hidden" name="id" value="@u.Id" />
                                 <button type="submit" title="Eliminar"
                                         class="p-1.5 text-slate-400 hover:text-status-error hover:bg-error-container rounded transition-colors">
                                     <span class="material-symbols-outlined text-sm">delete</span>
