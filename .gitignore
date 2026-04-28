@@ -70,3 +70,5 @@ coverage/
 
 # Static files (lib) - can be restored
 lib/
+
+**/Properties/launchSettings.json
