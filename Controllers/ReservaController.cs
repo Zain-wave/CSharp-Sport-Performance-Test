@@ -32,10 +32,47 @@ public class ReservaController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(Reserva reserva)
+    public async Task<IActionResult> Create(ReservaCreateViewModel model)
     {
-        var response = await _reservaService.CreateReserva(reserva);
-        if (!response.Success) TempData["Mensaje"] = response.Message;
+        try
+        {
+            if (!DateTime.TryParse(model.Fecha, out var fecha))
+            {
+                TempData["Mensaje"] = "Fecha inválida";
+                return RedirectToAction("Index");
+            }
+
+            if (!TimeSpan.TryParse(model.HoraInicio, out var horaInicio))
+            {
+                TempData["Mensaje"] = "Hora de inicio inválida";
+                return RedirectToAction("Index");
+            }
+
+            if (!TimeSpan.TryParse(model.HoraFin, out var horaFin))
+            {
+                TempData["Mensaje"] = "Hora de fin inválida";
+                return RedirectToAction("Index");
+            }
+
+            fecha = DateTime.SpecifyKind(fecha, DateTimeKind.Utc);
+
+            var reserva = new Reserva
+            {
+                UsuarioId = model.UsuarioId,
+                EspacioDeportivoId = model.EspacioDeportivoId,
+                Fecha = fecha,
+                HoraInicio = horaInicio,
+                HoraFin = horaFin
+            };
+
+            var response = await _reservaService.CreateReserva(reserva);
+            if (!response.Success) TempData["Mensaje"] = response.Message;
+        }
+        catch (Exception ex)
+        {
+            TempData["Mensaje"] = $"Error al crear reserva: {ex.Message}";
+        }
+
         return RedirectToAction("Index");
     }
 
