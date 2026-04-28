@@ -68,17 +68,24 @@
             <div class="bg-surface-primary rounded border border-surface-variant overflow-hidden group hover:shadow-md transition-shadow">
 
                 <!-- Imagen / placeholder por tipo -->
-                <div class="h-48 bg-surface-dim relative flex items-center justify-center">
-                    <span class="material-symbols-outlined text-7xl text-outline/20">
-                        @(e.Tipo.ToLower() switch {
-                            var t when t.Contains("fútbol") || t.Contains("futbol") || t.Contains("cancha") => "sports_soccer",
-                            var t when t.Contains("tenis")  => "sports_tennis",
-                            var t when t.Contains("balon")  => "sports_basketball",
-                            var t when t.Contains("piscin") || t.Contains("nataci") => "pool",
-                            var t when t.Contains("pista")  || t.Contains("atletis") => "directions_run",
-                            _ => "stadium"
-                        })
-                    </span>
+                <div class="h-48 bg-surface-dim relative flex items-center justify-center overflow-hidden">
+                    @if (!string.IsNullOrEmpty(e.ImagenUrl))
+                    {
+                        <img src="@e.ImagenUrl" alt="@e.Nombre" class="w-full h-full object-cover" />
+                    }
+                    else
+                    {
+                        <span class="material-symbols-outlined text-7xl text-outline/20">
+                            @(e.Tipo.ToLower() switch {
+                                var t when t.Contains("fútbol") || t.Contains("futbol") || t.Contains("cancha") => "sports_soccer",
+                                var t when t.Contains("tenis")  => "sports_tennis",
+                                var t when t.Contains("balon")  => "sports_basketball",
+                                var t when t.Contains("piscin") || t.Contains("nataci") => "pool",
+                                var t when t.Contains("pista")  || t.Contains("atletis") => "directions_run",
+                                _ => "stadium"
+                            })
+                        </span>
+                    }
                     <!-- Badge estado -->
                     @if (e.Activo)
                     {
@@ -119,12 +126,12 @@
                         </span>
                         <div class="flex items-center gap-2">
                             <button title="Editar"
-                                    onclick="abrirModalEditarEspacio(@e.Id, '@e.Nombre', '@e.Tipo', @e.Capacidad)"
+                                    onclick="abrirModalEditarEspacio(@e.Id, '@e.Nombre', '@e.Tipo', @e.Capacidad, '@(e.ImagenUrl ?? "")')"
                                     class="p-1 text-slate-400 hover:text-brand-green-mid transition-colors">
                                 <span class="material-symbols-outlined text-sm">edit</span>
                             </button>
-                            <form asp-action="Delete" asp-route-id="@e.Id" method="post" style="display:inline;"
-                                  onsubmit="return confirm('¿Eliminar @e.Nombre?')">
+                            <form action="/EspacioDeportivo/Delete" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@e.Id" />
                                 <button type="submit" title="Eliminar"
                                         class="p-1 text-slate-400 hover:text-status-error transition-colors">
                                     <span class="material-symbols-outlined text-sm">delete</span>
@@ -164,7 +171,7 @@ else
             </button>
         </div>
 
-        <form asp-action="Create" method="post" class="px-6 py-5 flex flex-col gap-4">
+        <form action="/EspacioDeportivo/Create" method="post" class="px-6 py-5 flex flex-col gap-4">
             <div>
                 <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Nombre</label>
                 <input name="Nombre" required placeholder="Ej. Cancha Principal Norte"
@@ -182,6 +189,13 @@ else
             <div>
                 <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Capacidad</label>
                 <input name="Capacidad" type="number" min="1" required placeholder="Número de personas"
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">URL de Imagen</label>
+                <input name="ImagenUrl" placeholder="https://ejemplo.com/imagen.jpg"
                        class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
                               font-body-sm text-body-sm text-on-surface
                               focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
@@ -223,7 +237,7 @@ else
             </button>
         </div>
 
-        <form asp-action="Edit" method="post" class="px-6 py-5 flex flex-col gap-4">
+        <form action="/EspacioDeportivo/Edit" method="post" class="px-6 py-5 flex flex-col gap-4">
             <input type="hidden" id="espacio-edit-id" name="Id" />
             <div>
                 <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Nombre</label>
@@ -242,6 +256,13 @@ else
             <div>
                 <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Capacidad</label>
                 <input id="espacio-edit-capacidad" name="Capacidad" type="number" min="1" required
+                       class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                              font-body-sm text-body-sm text-on-surface
+                              focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
+            </div>
+            <div>
+                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">URL de Imagen</label>
+                <input id="espacio-edit-imagen" name="ImagenUrl" placeholder="https://ejemplo.com/imagen.jpg"
                        class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
                               font-body-sm text-body-sm text-on-surface
                               focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
@@ -266,11 +287,12 @@ else
 
 @section Scripts {
     <script>
-        function abrirModalEditarEspacio(id, nombre, tipo, capacidad) {
+        function abrirModalEditarEspacio(id, nombre, tipo, capacidad, imagenUrl = '') {
             document.getElementById('espacio-edit-id').value        = id;
             document.getElementById('espacio-edit-nombre').value    = nombre;
             document.getElementById('espacio-edit-tipo').value      = tipo;
             document.getElementById('espacio-edit-capacidad').value = capacidad;
+            document.getElementById('espacio-edit-imagen').value = imagenUrl || '';
             document.getElementById('modal-editar-espacio').classList.remove('hidden');
         }
         ['modal-crear-espacio','modal-editar-espacio'].forEach(id => {
