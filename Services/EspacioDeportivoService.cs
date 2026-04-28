@@ -8,46 +8,103 @@ namespace SportsSebastianVargas.Services;
 public class EspacioDeportivoService
 {
     private readonly AppDbContext _context;
+    private readonly Dictionary<int, EspacioDeportivo> _cache = new();
 
-    public EspacioDeportivoService(AppDbContext context) { _context = context; }
+    public EspacioDeportivoService(AppDbContext context)
+    {
+        _context = context;
+        CargarCache();
+    }
+
+    private void CargarCache()
+    {
+        try
+        {
+            _cache.Clear();
+            var espacios = _context.EspacioDeportivo.ToList();
+            foreach (var e in espacios)
+                _cache[e.Id] = e;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error cargando cache de espacios: {ex.Message}");
+        }
+    }
 
     public async Task<ResponseService<List<EspacioDeportivo>>> GetEspacios(string? tipo = null)
     {
-        var query = _context.EspacioDeportivo.Where(e => e.Activo);
-        if (!string.IsNullOrEmpty(tipo))
-            query = query.Where(e => e.Tipo.ToLower() == tipo.ToLower());
-        
-        var espacios = await query.ToListAsync();
-        return new ResponseService<List<EspacioDeportivo>>(espacios, espacios.Count > 0 ? "Espacios cargados" : "No hay espacios", espacios.Count > 0);
+        try
+        {
+            var query = _cache.Values.Where(e => e.Activo);
+            if (!string.IsNullOrEmpty(tipo))
+                query = query.Where(e => e.Tipo.ToLower() == tipo.ToLower());
+
+            var espacios = query.ToList();
+            return new ResponseService<List<EspacioDeportivo>>(espacios, espacios.Count > 0 ? "Espacios cargados" : "No hay espacios", espacios.Count > 0);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al obtener espacios: {ex.Message}");
+            return new ResponseService<List<EspacioDeportivo>>(new(), "Error al cargar espacios", false);
+        }
     }
 
     public async Task<ResponseService<EspacioDeportivo>> CreateEspacio(EspacioDeportivo espacio)
     {
-        var existe = await _context.EspacioDeportivo.AnyAsync(e => e.Nombre.ToLower() == espacio.Nombre.ToLower());
-        if (existe) return new ResponseService<EspacioDeportivo>(null, "Espacio ya registrado", false);
+        try
+        {
+            if (_cache.Values.Any(e => e.Nombre.ToLower() == espacio.Nombre.ToLower()))
+                return new ResponseService<EspacioDeportivo>(null, "Espacio ya registrado", false);
 
-        await _context.EspacioDeportivo.AddAsync(espacio);
-        await _context.SaveChangesAsync();
-        return new ResponseService<EspacioDeportivo>(espacio, "Espacio creado", true);
+            await _context.EspacioDeportivo.AddAsync(espacio);
+            await _context.SaveChangesAsync();
+            _cache[espacio.Id] = espacio;
+            return new ResponseService<EspacioDeportivo>(espacio, "Espacio creado", true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al crear espacio: {ex.Message}");
+            return new ResponseService<EspacioDeportivo>(null, "Error al crear espacio", false);
+        }
     }
 
     public async Task<ResponseService<EspacioDeportivo>> UpdateEspacio(EspacioDeportivo espacio)
     {
-        var old = await _context.EspacioDeportivo.FirstOrDefaultAsync(e => e.Id == espacio.Id);
-        if (old == null) return new ResponseService<EspacioDeportivo>(null, "Espacio no encontrado", false);
+        try
+        {
+            if (!_cache.ContainsKey(espacio.Id))
+                return new ResponseService<EspacioDeportivo>(null, "Espacio no encontrado", false);
 
-        _context.Entry(old).CurrentValues.SetValues(espacio);
-        await _context.SaveChangesAsync();
-        return new ResponseService<EspacioDeportivo>(espacio, "Espacio actualizado", true);
+            var old = _cache[espacio.Id];
+            _context.Entry(old).CurrentValues.SetValues(espacio);
+            await _context.SaveChangesAsync();
+            _cache[espacio.Id] = espacio;
+            return new ResponseService<EspacioDeportivo>(espacio, "Espacio actualizado", true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al actualizar espacio: {ex.Message}");
+            return new ResponseService<EspacioDeportivo>(null, "Error al actualizar espacio", false);
+        }
     }
 
     public async Task<ResponseService<EspacioDeportivo>> DeleteEspacio(int id)
     {
-        var espacio = await _context.EspacioDeportivo.FindAsync(id);
-        if (espacio == null) return new ResponseService<EspacioDeportivo>(null, "Espacio no encontrado", false);
+        try
+        {
+            if (!_cache.ContainsKey(id))
+                return new ResponseService<EspacioDeportivo>(null, "Espacio no encontrado", false);
 
-        espacio.Activo = false;
-        await _context.SaveChangesAsync();
-        return new ResponseService<EspacioDeportivo>(espacio, "Espacio eliminado", true);
+            var espacio = _cache[id];
+            espacio.Activo = false;
+            await _context.SaveChangesAsync();
+            _cache[id] = espacio;
+            return new ResponseService<EspacioDeportivo>(espacio, "Espacio eliminado", true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al eliminar espacio: {ex.Message}");
+            return new ResponseService<EspacioDeportivo>(null, "Error al eliminar espacio", false);
+        }
     }
 }

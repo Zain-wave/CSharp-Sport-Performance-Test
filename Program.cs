@@ -28,9 +28,9 @@ using (var scope = app.Services.CreateScope())
             new SportsSebastianVargas.Models.Usuario { Nombre = "Andres Ruiz", DocumentoIdentidad = "1034567890", Telefono = "3003456789", CorreoElectronico = "andres.ruiz@mail.com", Activo = true }
         );
         db.EspacioDeportivo.AddRange(
-            new SportsSebastianVargas.Models.EspacioDeportivo { Nombre = "Cancha Futbol 1", Tipo = "Futbol", Capacidad = 22, Activo = true },
-            new SportsSebastianVargas.Models.EspacioDeportivo { Nombre = "Cancha Tenis A", Tipo = "Tenis", Capacidad = 4, Activo = true },
-            new SportsSebastianVargas.Models.EspacioDeportivo { Nombre = "Polideportivo Central", Tipo = "Multiuso", Capacidad = 50, Activo = true }
+            new SportsSebastianVargas.Models.EspacioDeportivo { Nombre = "Cancha Futbol 1", Tipo = "Futbol", Capacidad = 22, Activo = true, ImagenUrl = "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80" },
+            new SportsSebastianVargas.Models.EspacioDeportivo { Nombre = "Cancha Tenis A", Tipo = "Tenis", Capacidad = 4, Activo = true, ImagenUrl = "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=800&q=80" },
+            new SportsSebastianVargas.Models.EspacioDeportivo { Nombre = "Polideportivo Central", Tipo = "Multiuso", Capacidad = 50, Activo = true, ImagenUrl = "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80" }
         );
         db.SaveChanges();
         var usuarios = db.Usuario.ToList();
