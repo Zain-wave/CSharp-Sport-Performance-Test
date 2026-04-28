@@ -13,16 +13,16 @@ public class UsuarioService
 
     public async Task<ResponseService<List<Usuario>>> GetUsuarios(string? estado = null)
     {
-        var query = _context.Usuario.AsQueryable();
+        IQueryable<Usuario> query;
         
-        if (!string.IsNullOrEmpty(estado))
+        if (string.IsNullOrEmpty(estado))
         {
-            var esActivo = estado.ToLower() == "activo";
-            query = query.Where(u => u.Activo == esActivo);
+            query = _context.Usuario;
         }
         else
         {
-            query = query.Where(u => u.Activo);
+            var esActivo = estado.ToLower() == "activo";
+            query = _context.Usuario.Where(u => u.Activo == esActivo);
         }
         
         var usuarios = await query.ToListAsync();

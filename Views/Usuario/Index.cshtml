@@ -34,7 +34,7 @@
                 class="w-full sm:w-auto bg-surface border border-outline-variant rounded px-4 py-2
                        font-body-sm text-body-sm text-on-surface-variant
                        focus:outline-none focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid">
-            <option value="">Todos</option>
+            <option value="" selected="@(Context.Request.Query["estado"].ToString() == "")">Todos</option>
             <option value="activo" selected="@(Context.Request.Query["estado"].ToString() == "activo")">Activo</option>
             <option value="inactivo" selected="@(Context.Request.Query["estado"].ToString() == "inactivo")">Inactivo</option>
         </select>
@@ -100,37 +100,36 @@
                         <div class="flex items-center justify-end gap-2">
                             @if (u.Activo)
                             {
-                                <form action="/Usuario/Toggle" method="post" style="display:inline;">
+                                <button title="Editar"
+                                        onclick="abrirModalEditar(@u.Id, '@u.Nombre', '@u.DocumentoIdentidad', '@u.Telefono', '@u.CorreoElectronico')"
+                                        class="p-1.5 text-slate-400 hover:text-brand-green-mid hover:bg-surface-secondary rounded transition-colors">
+                                    <span class="material-symbols-outlined text-sm">edit</span>
+                                </button>
+                                <form action="/Usuario/Toggle" method="post" style="display:inline;"
+                                      onsubmit="return confirm('¿Desactivar a @u.Nombre?')">
                                     <input type="hidden" name="id" value="@u.Id" />
                                     <button type="submit" title="Desactivar"
-                                            class="p-1.5 text-status-warning hover:text-status-warning hover:bg-status-warning/10 rounded transition-colors">
-                                        <span class="material-symbols-outlined text-sm">block</span>
+                                            class="p-1.5 text-slate-400 hover:text-status-error hover:bg-error-container rounded transition-colors">
+                                        <span class="material-symbols-outlined text-sm">toggle_off</span>
                                     </button>
                                 </form>
                             }
                             else
                             {
-                                <form action="/Usuario/Toggle" method="post" style="display:inline;">
+                                <button title="Editar"
+                                        onclick="abrirModalEditar(@u.Id, '@u.Nombre', '@u.DocumentoIdentidad', '@u.Telefono', '@u.CorreoElectronico')"
+                                        class="p-1.5 text-slate-400 hover:text-brand-green-mid hover:bg-surface-secondary rounded transition-colors">
+                                    <span class="material-symbols-outlined text-sm">edit</span>
+                                </button>
+                                <form action="/Usuario/Toggle" method="post" style="display:inline;"
+                                      onsubmit="return confirm('¿Activar a @u.Nombre?')">
                                     <input type="hidden" name="id" value="@u.Id" />
                                     <button type="submit" title="Activar"
                                             class="p-1.5 text-brand-green-mid hover:text-brand-green-dark hover:bg-brand-green-light/20 rounded transition-colors">
-                                        <span class="material-symbols-outlined text-sm">check_circle</span>
+                                        <span class="material-symbols-outlined text-sm">toggle_on</span>
                                     </button>
                                 </form>
                             }
-                            <button title="Editar"
-                                    onclick="abrirModalEditar(@u.Id, '@u.Nombre', '@u.DocumentoIdentidad', '@u.Telefono', '@u.CorreoElectronico')"
-                                    class="p-1.5 text-slate-400 hover:text-brand-green-mid hover:bg-surface-secondary rounded transition-colors">
-                                <span class="material-symbols-outlined text-sm">edit</span>
-                            </button>
-                            <form action="/Usuario/Delete" method="post" style="display:inline;"
-                                  onsubmit="return confirm('¿Eliminar a @u.Nombre?')">
-                                <input type="hidden" name="id" value="@u.Id" />
-                                <button type="submit" title="Eliminar"
-                                        class="p-1.5 text-slate-400 hover:text-status-error hover:bg-error-container rounded transition-colors">
-                                    <span class="material-symbols-outlined text-sm">delete</span>
-                                </button>
-                            </form>
                         </div>
                     </td>
                 </tr>
