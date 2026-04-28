@@ -158,13 +158,15 @@
                                 <td class="py-4 px-6 text-right">
                                     @if (r.Estado == EstadoReserva.Activa)
                                     {
-                                        <form asp-action="Cancel" asp-route-id="@r.Id" method="post" style="display:inline;">
+                                        <form action="/Reserva/Cancel" method="post" style="display:inline;">
+                                            <input type="hidden" name="id" value="@r.Id" />
                                             <button type="submit" title="Cancelar"
                                                     class="text-outline hover:text-status-error p-1 transition-colors">
                                                 <span class="material-symbols-outlined text-[20px]">cancel</span>
                                             </button>
                                         </form>
-                                        <form asp-action="Finish" asp-route-id="@r.Id" method="post" style="display:inline;">
+                                        <form action="/Reserva/Finish" method="post" style="display:inline;">
+                                            <input type="hidden" name="id" value="@r.Id" />
                                             <button type="submit" title="Finalizar"
                                                     class="text-outline hover:text-brand-green-mid p-1 transition-colors">
                                                 <span class="material-symbols-outlined text-[20px]">check_circle</span>
