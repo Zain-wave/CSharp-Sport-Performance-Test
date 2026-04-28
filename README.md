@@ -76,7 +76,7 @@ dotnet run --project Sports-Sebastian-Vargas.csproj --urls "http://localhost:500
 - ✅ Filter by facility
 
 ### Notifications
-- ⚠️ Email configured but without credentials
+- ⚠️ Email configured but without credentials only simulated
 
 ## 📁 Project Structure
 
