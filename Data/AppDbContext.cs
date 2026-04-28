@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SportsSebastianVargas.Models;
 
 namespace SportsSebastianVargas.Data;
@@ -19,5 +20,13 @@ public class AppDbContext : DbContext
             .HasIndex(u => u.CorreoElectronico).IsUnique();
         modelBuilder.Entity<EspacioDeportivo>()
             .HasIndex(e => e.Nombre).IsUnique();
+
+        var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+            v => v,
+            v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+        modelBuilder.Entity<Reserva>()
+            .Property(r => r.Fecha)
+            .HasConversion(dateTimeConverter);
     }
 }
