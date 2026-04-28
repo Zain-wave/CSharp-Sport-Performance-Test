@@ -11,9 +11,9 @@ public class UsuarioController : Controller
 
     public UsuarioController(UsuarioService usuarioService) { _usuarioService = usuarioService; }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? estado = null)
     {
-        var response = await _usuarioService.GetUsuarios();
+        var response = await _usuarioService.GetUsuarios(estado);
         return View(new UsuarioViewModel { UsuarioList = response.Data ?? new List<Usuario>() });
     }
 
@@ -37,6 +37,14 @@ public class UsuarioController : Controller
     public async Task<IActionResult> Delete(int id)
     {
         var response = await _usuarioService.DeleteUsuario(id);
+        if (!response.Success) TempData["Mensaje"] = response.Message;
+        return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Toggle(int id)
+    {
+        var response = await _usuarioService.ToggleEstado(id);
         if (!response.Success) TempData["Mensaje"] = response.Message;
         return RedirectToAction("Index");
     }
