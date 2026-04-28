@@ -72,3 +72,4 @@ coverage/
 lib/
 
 **/Properties/launchSettings.json
+appsettings.Development.json
