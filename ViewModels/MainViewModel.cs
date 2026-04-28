@@ -21,3 +21,12 @@ public class ReservaViewModel
     public List<Usuario> UsuarioList { get; set; } = new();
     public List<EspacioDeportivo> EspacioList { get; set; } = new();
 }
+
+public class ReservaCreateViewModel
+{
+    public int UsuarioId { get; set; }
+    public int EspacioDeportivoId { get; set; }
+    public string Fecha { get; set; } = "";
+    public string HoraInicio { get; set; } = "";
+    public string HoraFin { get; set; } = "";
+}
