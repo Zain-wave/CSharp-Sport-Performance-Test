@@ -8,13 +8,23 @@ namespace SportsSebastianVargas.Controllers;
 public class ReservaController : Controller
 {
     private readonly ReservaService _reservaService;
+    private readonly UsuarioService _usuarioService;
 
-    public ReservaController(ReservaService reservaService) { _reservaService = reservaService; }
+    public ReservaController(ReservaService reservaService, UsuarioService usuarioService)
+    {
+        _reservaService = reservaService;
+        _usuarioService = usuarioService;
+    }
 
     public async Task<IActionResult> Index()
     {
-        var response = await _reservaService.GetReservas();
-        return View(new ReservaViewModel { ReservaList = response.Data ?? new List<Reserva>() });
+        var reservas = await _reservaService.GetReservas();
+        var usuarios = await _usuarioService.GetUsuarios();
+        return View(new ReservaViewModel
+        {
+            ReservaList = reservas.Data ?? new List<Reserva>(),
+            UsuarioList = usuarios.Data ?? new List<Usuario>()
+        });
     }
 
     [HttpPost]
