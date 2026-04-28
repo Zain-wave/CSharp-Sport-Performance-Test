@@ -22,7 +22,7 @@ public class ReservaService
         var reservas = await _context.Reserva
             .Include(r => r.Usuario)
             .Include(r => r.EspacioDeportivo)
-            .Where(r => r.Usuario.Activo && r.EspacioDeportivo.Activo)
+            .Where(r => r.Usuario!.Activo && r.EspacioDeportivo!.Activo)
             .ToListAsync();
         return new ResponseService<List<Reserva>>(reservas, reservas.Count > 0 ? "Reservas cargadas" : "No hay reservas", reservas.Count > 0);
     }
