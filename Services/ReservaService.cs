@@ -27,6 +27,27 @@ public class ReservaService
         return new ResponseService<List<Reserva>>(reservas, reservas.Count > 0 ? "Reservas cargadas" : "No hay reservas", reservas.Count > 0);
     }
 
+    public async Task<ResponseService<List<Reserva>>> GetReservas(string? usuarioId = null, string? espacioId = null)
+    {
+        var query = _context.Reserva
+            .Include(r => r.Usuario)
+            .Include(r => r.EspacioDeportivo)
+            .Where(r => r.Usuario!.Activo && r.EspacioDeportivo!.Activo);
+
+        if (!string.IsNullOrEmpty(usuarioId) && int.TryParse(usuarioId, out var uid))
+        {
+            query = query.Where(r => r.UsuarioId == uid);
+        }
+
+        if (!string.IsNullOrEmpty(espacioId) && int.TryParse(espacioId, out var eid))
+        {
+            query = query.Where(r => r.EspacioDeportivoId == eid);
+        }
+
+        var reservas = await query.ToListAsync();
+        return new ResponseService<List<Reserva>>(reservas, reservas.Count > 0 ? "Reservas cargadas" : "No hay reservas", true);
+    }
+
     public async Task<ResponseService<Reserva>> CreateReserva(Reserva reserva)
     {
         if (reserva.HoraFin <= reserva.HoraInicio)

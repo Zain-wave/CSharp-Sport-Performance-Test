@@ -29,13 +29,15 @@
         <!-- Filtros -->
         <div class="bg-surface-primary border border-outline-variant rounded-xl p-4 shadow-sm
                     flex flex-wrap gap-4 items-end">
+            <form method="get" action="/Reserva/Index" class="flex flex-wrap gap-4 items-end w-full">
             <div class="flex-1 min-w-[200px]">
                 <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">
                     Buscar Usuario
                 </label>
                 <div class="relative">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
-                    <input type="text" placeholder="Nombre o ID..."
+                    <input type="text" name="usuarioId" placeholder="Nombre o ID..."
+                           value="@Context.Request.Query["usuarioId"]"
                            class="w-full pl-10 pr-3 py-2 bg-surface border border-outline-variant rounded
                                   font-body-sm text-body-sm text-on-surface
                                   focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none transition-all" />
@@ -45,24 +47,33 @@
                 <label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">
                     Espacio Deportivo
                 </label>
-                <select class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
-                               font-body-sm text-body-sm text-on-surface
-                               focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none appearance-none">
-                    <option>Todos los espacios</option>
-                    @foreach (var r in Model.ReservaList
-                        .Where(r => r.EspacioDeportivo != null)
-                        .Select(r => r.EspacioDeportivo!.Nombre)
-                        .Distinct())
+                <select name="espacioId"
+                        class="w-full px-3 py-2 bg-surface border border-outline-variant rounded
+                                       font-body-sm text-body-sm text-on-surface
+                                       focus:border-brand-green-mid focus:ring-1 focus:ring-brand-green-mid outline-none appearance-none">
+                    <option value="">Todos los espacios</option>
+                    @foreach (var e in Model.EspacioList)
                     {
-                        <option>@r</option>
+                        <option value="@e.Id" selected="@(Context.Request.Query["espacioId"].ToString() == e.Id.ToString())">@e.Nombre</option>
                     }
                 </select>
             </div>
-            <button class="bg-transparent border border-brand-green-mid text-brand-green-mid
-                           hover:bg-brand-green-mid/5 transition-colors rounded-xl px-6 py-2
-                           font-button text-button h-[38px]">
+            <button type="submit"
+                            class="bg-transparent border border-brand-green-mid text-brand-green-mid
+                                           hover:bg-brand-green-mid/5 transition-colors rounded-xl px-6 py-2
+                                           font-button text-button h-[38px]">
                 Filtrar
             </button>
+            @if (!string.IsNullOrEmpty(Context.Request.Query["usuarioId"]) || !string.IsNullOrEmpty(Context.Request.Query["espacioId"]))
+            {
+                <a href="/Reserva/Index"
+                   class="bg-surface-container text-on-surface-variant hover:bg-surface-container-high
+                                  transition-colors rounded-xl px-4 py-2
+                                  font-button text-button h-[38px] flex items-center gap-1">
+                    Limpiar
+                </a>
+            }
+            </form>
         </div>
 
         <!-- Tabla -->

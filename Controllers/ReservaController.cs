@@ -18,9 +18,9 @@ public class ReservaController : Controller
         _espacioService = espacioService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? usuarioId = null, string? espacioId = null)
     {
-        var reservas = await _reservaService.GetReservas();
+        var reservas = await _reservaService.GetReservas(usuarioId, espacioId);
         var usuarios = await _usuarioService.GetUsuarios();
         var espacios = await _espacioService.GetEspacios();
         return View(new ReservaViewModel
