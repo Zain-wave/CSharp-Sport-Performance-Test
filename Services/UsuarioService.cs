@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SportsSebastianVargas.Data;
 using SportsSebastianVargas.Models;
+using SportsSebastianVargas.Models.Enums;
 using SportsSebastianVargas.Response;
 
 namespace SportsSebastianVargas.Services;
@@ -75,6 +76,20 @@ public class UsuarioService
 
         usuario.Activo = !usuario.Activo;
         await _context.SaveChangesAsync();
-        return new ResponseService<Usuario>(usuario, usuario.Activo ? "Usuario activado" : "Usuario desactivado", true);
+
+        if (!usuario.Activo)
+        {
+            var reservasActivas = await _context.Reserva
+                .Where(r => r.UsuarioId == id && r.Estado == EstadoReserva.Activa)
+                .ToListAsync();
+            
+            foreach (var reserva in reservasActivas)
+            {
+                reserva.Estado = EstadoReserva.Cancelada;
+            }
+            await _context.SaveChangesAsync();
+        }
+
+        return new ResponseService<Usuario>(usuario, usuario.Activo ? "Usuario activado" : "Usuario desactivado y reservas canceladas", true);
     }
 }
