@@ -120,19 +120,19 @@
             @{
                 var ctrl = ViewContext.RouteData.Values["controller"]?.ToString();
             }
-            <a asp-controller="Usuario" asp-action="Index"
+            <a href="/Usuario"
                class="mx-2 px-4 py-3 flex items-center gap-3 rounded-md transition-all
                       @(ctrl == "Usuario" ? "bg-green-800 text-white" : "text-green-100/70 hover:text-white hover:bg-green-800/50")">
                 <span class="material-symbols-outlined">group</span>
                 Usuarios
             </a>
-            <a asp-controller="EspacioDeportivo" asp-action="Index"
+            <a href="/EspacioDeportivo"
                class="mx-2 px-4 py-3 flex items-center gap-3 rounded-md transition-all
                       @(ctrl == "EspacioDeportivo" ? "bg-green-800 text-white" : "text-green-100/70 hover:text-white hover:bg-green-800/50")">
                 <span class="material-symbols-outlined">stadium</span>
                 Espacios Deportivos
             </a>
-            <a asp-controller="Reserva" asp-action="Index"
+            <a href="/Reserva" 
                class="mx-2 px-4 py-3 flex items-center gap-3 rounded-md transition-all
                       @(ctrl == "Reserva" ? "bg-green-800 text-white" : "text-green-100/70 hover:text-white hover:bg-green-800/50")">
                 <span class="material-symbols-outlined">event_available</span>
